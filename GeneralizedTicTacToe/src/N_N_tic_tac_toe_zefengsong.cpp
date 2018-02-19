@@ -12,21 +12,20 @@ int checkWin(vector<vector<int>>& gameBoard, int row, int col, int player, int M
 	while (row_up >= 0 && gameBoard[row_up][col] == player) count_vertical++, row_up--;
 	int row_down = row + 1;
 	while (row_down < N && gameBoard[row_down][col] == player) count_vertical++, row_down++;
-
+	
 	// Check horizontal
 	int count_horizontal = 1;
 	int col_left = col - 1;
 	while (col_left >= 0 && gameBoard[row][col_left] == player) count_horizontal++, col_left--;
 	int col_right = col + 1;
 	while (col_right < N && gameBoard[row][col_right] == player) count_horizontal++, col_right++;
-
+	
 	// Check diagonal
 	int count_diagonal_left = 1;
 	int row_left_up = row - 1, col_left_up = col - 1;
 	while (row_left_up >= 0 && col_left_up >= 0 && gameBoard[row_left_up][col_left_up] == player) count_diagonal_left++, row_left_up--, col_left_up--;
 	int row_right_down = row + 1, col_right_down = col + 1;
 	while (row_right_down < N && col_right_down < N && gameBoard[row_right_down][col_right_down] == player) count_diagonal_left++, row_right_down++, col_right_down++;
-
 
 	int count_diagonal_right = 1;
 	int row_left_down = row + 1, col_left_down = col - 1;
