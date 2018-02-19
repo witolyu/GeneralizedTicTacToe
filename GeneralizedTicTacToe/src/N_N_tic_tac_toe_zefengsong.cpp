@@ -6,15 +6,12 @@ int N = 0;
 
 /* Check if the current player wins */
 int checkWin(vector<vector<int>>& gameBoard, int row, int col, int player, int M) {
-	//cout << "check for " << row << "," << col << endl;
 	// Check vertical
 	int count_vertical = 1;
 	int row_up = row - 1;
 	while (row_up >= 0 && gameBoard[row_up][col] == player) count_vertical++, row_up--;
 	int row_down = row + 1;
 	while (row_down < N && gameBoard[row_down][col] == player) count_vertical++, row_down++;
-
-	//cout << "count_vertical=" << count_vertical << endl;
 
 	// Check horizontal
 	int count_horizontal = 1;
@@ -23,24 +20,19 @@ int checkWin(vector<vector<int>>& gameBoard, int row, int col, int player, int M
 	int col_right = col + 1;
 	while (col_right < N && gameBoard[row][col_right] == player) count_horizontal++, col_right++;
 
-	//cout << "count_horizontal=" << count_horizontal << endl;
-
 	// Check diagonal
 	int count_diagonal_left = 1;
 	int row_left_up = row - 1, col_left_up = col - 1;
 	while (row_left_up >= 0 && col_left_up >= 0 && gameBoard[row_left_up][col_left_up] == player) count_diagonal_left++, row_left_up--, col_left_up--;
 	int row_right_down = row + 1, col_right_down = col + 1;
 	while (row_right_down < N && col_right_down < N && gameBoard[row_right_down][col_right_down] == player) count_diagonal_left++, row_right_down++, col_right_down++;
-	
-	//cout << "count_diagonal_left=" << count_diagonal_left << endl;
+
 
 	int count_diagonal_right = 1;
 	int row_left_down = row + 1, col_left_down = col - 1;
 	while (row_left_down < N && col_left_down >= 0 && gameBoard[row_left_down][col_left_down] == player) count_diagonal_right++, row_left_down++, col_left_down--;
 	int row_right_up = row - 1, col_right_up = col + 1;
 	while (row_right_up >= 0 && col_right_up < N && gameBoard[row_right_up][col_right_up] == player) count_diagonal_right++, row_right_up--, col_right_up++;
-
-	//cout << "count_diagonal_right=" << count_diagonal_right << endl;
 
 	return (count_vertical >= M || count_horizontal >= M || count_diagonal_left >= M || count_diagonal_right >= M) ? player : 0;
 }
@@ -125,11 +117,8 @@ int main() {
 	cout << "Enter win condition M:" << endl;
 	cin >> M;
 
-	//cout << "board size = " << N << ", goal = " << M << endl;
-
 	vector<vector<int>>gameBoard(N, vector<int>(N, 0));
 	vector<vector<vector<int>>>record(N * N + 1, vector<vector<int>>(N, vector<int>(N, 0)));
-
 
 	solve(gameBoard, record, 1, 0, M);
 	for (int i = 0; i < N * N + 1; i++) {
