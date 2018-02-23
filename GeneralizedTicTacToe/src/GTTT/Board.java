@@ -30,9 +30,6 @@ public class Board {
 	
 	
 	// 0 represents empty, 1 represents O or player 1, 2 represents X or player 2.
-
-
-
 	//Construct and ini. Return empty board.
 	public Board(int size, int winningRowSize) {
 	   	this.size = size;
@@ -202,6 +199,10 @@ public class Board {
     
     public int getMoveCount(){
     	return moveCount;
+    }
+    
+    public boolean checkEmptyMove(int x,int y){
+    	return tBoard[x][y] == 0;
     }
     
     public Board getDeepCopy(){
@@ -382,10 +383,10 @@ public class Board {
   		//Print the board with lite interface, primarily used.
   		public void PrintBoardLite(){
   			/*Print first line*/
-  			System.out.print("x\\y| ");
+  			System.out.print("x\\y|");
   			for (int i = 0; i < size ; i++)
   			{
-  				System.out.printf("%d ", i+1);
+  				System.out.printf("%2d", i+1);
   			}
   			System.out.print("\n");
   			
@@ -412,10 +413,10 @@ public class Board {
   		
   		public void PrintBoardLiteWithAvail(){
   			/*Print first line*/
-  			System.out.print("x\\y| ");
+  			System.out.print("x\\y|");
   			for (int i = 0; i < size ; i++)
   			{
-  				System.out.printf("%d ", i+1);
+  				System.out.printf("%2d", i+1);
   			}
   			System.out.print("\n");
   			
@@ -443,139 +444,120 @@ public class Board {
   		   		System.out.print("\n");
   		   	}
   		}
-    
-    
-	
-  		
-  		
-  		
-  		
-  		
-  		
-  		
-  		
-  		
-  		
-  		
-  		
-  		
-  		
-  		
-  		
   		
   //*********************************************************************Obselete********************************************************************//
 
 	//Return 0 if no one win, 1 for player 1 win, 2 for player 2 win.
-	public int CheckGameOver(){
-		//0 is no winner (yet), 1 is player 1 win, 2 is player 2 win.
-		int result = 0;
-		int count = 0;
-		
-		//check all possible rows
-		for (int i = 0; i < size ; i++)
-	   	{
-	   		for (int j = 0; j < size-winningRowSize +1; j++)
-	   		{
-	   			count = 0;
-	   			for (int k = j; k < j+winningRowSize; k++)
-	   			{
-	   				if (tBoard[i][k] == 0)
-	   				{
-	   					count = 0;
-	   					break;
-	   				}
-	   				count += tBoard[i][k];   					
-	   			}
-	   			if (count == 2 * winningRowSize){
-	   				result = 2;
-	   				return result;
-	   			}
-	   			else if (count == winningRowSize){
-	   				result = 1;
-	   				return result;
-	   			}
-	   		}
-	   	}
-		//check all possible columns		
-		for (int j = 0; j < size ; j++)
-	   	{
-	   		for (int i = 0; i < size-winningRowSize +1; i++)
-	   		{
-	   			count = 0;
-	   			for (int k = i; k < i+winningRowSize; k++)
-	   			{
-	   				if (tBoard[k][j] == 0)
-	   				{
-	   					count = 0;
-	   					break;
-	   				}
-	   				count += tBoard[k][j];   					
-	   			}
-	   			if (count == 2 * winningRowSize){
-	   				result = 2;
-	   				return result;
-	   			}
-	   			else if (count == winningRowSize){
-	   				result = 1;
-	   				return result;
-	   			}
-	   		}
-	   	}
-		
-		//check all possible \ diagonal
-		for (int i = 0; i < size-winningRowSize +1 ; i++)
-	   	{
-	   		for (int j = 0; j < size-winningRowSize +1; j++)
-	   		{
-	   			count = 0;
-	   			for (int k = 0; k < winningRowSize; k++)
-	   			{
-	   				if (tBoard[i+k][j+k] == 0)
-	   				{
-	   					count = 0;
-	   					break;
-	   				}
-	   				count += tBoard[i+k][j+k];   					
-	   			}
-	   			if (count == 2 * winningRowSize){
-	   				result = 2;
-	   				return result;
-	   			}
-	   			else if (count == winningRowSize){
-	   				result = 1;
-	   				return result;
-	   			}
-	   		}
-	   	}
-		
-		//check all possible / diagonal
-		for (int i = winningRowSize - 1; i < size; i++)
-	   	{
-	   		for (int j = 0; j < size-winningRowSize +1; j++)
-	   		{
-	   			count = 0;
-	   			for (int k = 0; k < winningRowSize; k++)
-	   			{
-	   				if (tBoard[i-k][j+k] == 0)
-	   				{
-	   					count = 0;
-	   					break;
-	   				}
-	   				count += tBoard[i-k][j+k];   					
-	   			}
-	   			if (count == 2 * winningRowSize){
-	   				result = 2;
-	   				return result;
-	   			}
-	   			else if (count == winningRowSize){
-	   				result = 1;
-	   				return result;
-	   			}
-	   		}
-	   	}
-		
-		return result;
-	}
+//	public int CheckGameOver(){
+//		//0 is no winner (yet), 1 is player 1 win, 2 is player 2 win.
+//		int result = 0;
+//		int count = 0;
+//		
+//		//check all possible rows
+//		for (int i = 0; i < size ; i++)
+//	   	{
+//	   		for (int j = 0; j < size-winningRowSize +1; j++)
+//	   		{
+//	   			count = 0;
+//	   			for (int k = j; k < j+winningRowSize; k++)
+//	   			{
+//	   				if (tBoard[i][k] == 0)
+//	   				{
+//	   					count = 0;
+//	   					break;
+//	   				}
+//	   				count += tBoard[i][k];   					
+//	   			}
+//	   			if (count == 2 * winningRowSize){
+//	   				result = 2;
+//	   				return result;
+//	   			}
+//	   			else if (count == winningRowSize){
+//	   				result = 1;
+//	   				return result;
+//	   			}
+//	   		}
+//	   	}
+//		//check all possible columns		
+//		for (int j = 0; j < size ; j++)
+//	   	{
+//	   		for (int i = 0; i < size-winningRowSize +1; i++)
+//	   		{
+//	   			count = 0;
+//	   			for (int k = i; k < i+winningRowSize; k++)
+//	   			{
+//	   				if (tBoard[k][j] == 0)
+//	   				{
+//	   					count = 0;
+//	   					break;
+//	   				}
+//	   				count += tBoard[k][j];   					
+//	   			}
+//	   			if (count == 2 * winningRowSize){
+//	   				result = 2;
+//	   				return result;
+//	   			}
+//	   			else if (count == winningRowSize){
+//	   				result = 1;
+//	   				return result;
+//	   			}
+//	   		}
+//	   	}
+//		
+//		//check all possible \ diagonal
+//		for (int i = 0; i < size-winningRowSize +1 ; i++)
+//	   	{
+//	   		for (int j = 0; j < size-winningRowSize +1; j++)
+//	   		{
+//	   			count = 0;
+//	   			for (int k = 0; k < winningRowSize; k++)
+//	   			{
+//	   				if (tBoard[i+k][j+k] == 0)
+//	   				{
+//	   					count = 0;
+//	   					break;
+//	   				}
+//	   				count += tBoard[i+k][j+k];   					
+//	   			}
+//	   			if (count == 2 * winningRowSize){
+//	   				result = 2;
+//	   				return result;
+//	   			}
+//	   			else if (count == winningRowSize){
+//	   				result = 1;
+//	   				return result;
+//	   			}
+//	   		}
+//	   	}
+//		
+//		//check all possible / diagonal
+//		for (int i = winningRowSize - 1; i < size; i++)
+//	   	{
+//	   		for (int j = 0; j < size-winningRowSize +1; j++)
+//	   		{
+//	   			count = 0;
+//	   			for (int k = 0; k < winningRowSize; k++)
+//	   			{
+//	   				if (tBoard[i-k][j+k] == 0)
+//	   				{
+//	   					count = 0;
+//	   					break;
+//	   				}
+//	   				count += tBoard[i-k][j+k];   					
+//	   			}
+//	   			if (count == 2 * winningRowSize){
+//	   				result = 2;
+//	   				return result;
+//	   			}
+//	   			else if (count == winningRowSize){
+//	   				result = 1;
+//	   				return result;
+//	   			}
+//	   		}
+//	   	}
+//		
+//		return result;
+//	}
 	
 	
 	//Check whether is last move, help to determine whether this is a draw.

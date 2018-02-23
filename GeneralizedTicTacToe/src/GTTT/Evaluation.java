@@ -147,7 +147,7 @@ public class Evaluation {
     	
     	for (int i = 0;i<feature.length;i++){
     		//System.out.printf("%d:%d, ", i+1 , feature[i]);
-    		score += (i+1)*feature[i]*Math.pow(1.1,i);
+    		score += (i+1)*feature[i]*Math.pow(2,i);
     	}
     	return score;
     	
