@@ -6,8 +6,8 @@ public class Console {
 
 	private Board board;
 	
-	public Console(int boardSize, int winningRowSize){
-		board = new Board(boardSize, winningRowSize,1);
+	public Console(int boardSize, int winningRowSize, int[] searchMode, int[] rivalSearchMode){
+		board = new Board(boardSize, winningRowSize,searchMode, rivalSearchMode);
 	}
 	
 	public void AIvsAI(){
@@ -26,8 +26,17 @@ public class Console {
 				}
 				break;
 			}
-			AIMove();
+			
+			if (board.getMoveCount() == 0)
+			{
+				board.move(board.getSize()/2,board.getSize()/2);
+
+			}else{
+				ABPMiniMax.run(board.getPlayer(),board);			
+			}
+			
 			board.PrintBoardLite();
+			System.out.println(board.getScore1()+","+board.getScore2());
 			System.out.printf("**********%s**********\n",date.toString());
 			if (board.isGameOver())
 			{
@@ -39,89 +48,12 @@ public class Console {
 				}
 				break;
 			}
-			AIMove();
+			ABPMiniMax.run(board.getPlayer(),board);	
 			board.PrintBoardLite();
+			System.out.println(board.getScore1()+","+board.getScore2());
 		}	
 	}
 	
-	public void AIvsPlayer(){
-		Date date = new Date();
-		System.out.println("Game start! AI 1 vs AI 2!");
-		board.PrintBoardLite();
-		while(true)
-		{
-			System.out.printf("**********%s**********\n",date.toString());
-			if (board.isGameOver())
-			{
-				if (board.getWinner() == 2){
-					System.out.println("AI 2 win!");
-				}else{
-					System.out.println("This is a draw!");
-				}
-				break;
-			}
-			AIMove();
-			board.PrintBoardLite();
-			System.out.printf("**********%s**********\n",date.toString());
-			if (board.isGameOver())
-			{
-				if (board.getWinner()==1)
-				{
-					System.out.println("AI 1 win!");
-				}else{
-					System.out.println("This is a draw!");
-				}
-				break;
-			}
-			PlayerMove();
-			board.PrintBoardLite();
-		}	
-	}
-	
-	public void PlayervsAI(){
-		Date date = new Date();
-		System.out.println("Game start! AI 1 vs AI 2!");
-		board.PrintBoardLite();
-		while(true)
-		{
-			System.out.printf("**********%s**********\n",date.toString());
-			if (board.isGameOver())
-			{
-				if (board.getWinner() == 2){
-					System.out.println("AI 2 win!");
-				}else{
-					System.out.println("This is a draw!");
-				}
-				break;
-			}
-			PlayerMove();
-			board.PrintBoardLite();
-			System.out.printf("**********%s**********\n",date.toString());
-			if (board.isGameOver())
-			{
-				if (board.getWinner()==1)
-				{
-					System.out.println("AI 1 win!");
-				}else{
-					System.out.println("This is a draw!");
-				}
-				break;
-			}
-			AIMove();
-			board.PrintBoardLite();
-		}	
-	}
-	
-	// Lack optimization (Exhaustive search, lacks depth limitation and heuristic value for larger size board)
-	public void AIMove()
-	{
-		if (board.getMoveCount() == 0)
-		{
-			board.move(board.getSize()/2,board.getSize()/2);
-		}else{
-			Algorithms.ABPMiniMax(board);			
-		}
-	}
 	
 	public void PlayerMove(){
 		int player = board.getPlayer();
@@ -148,8 +80,7 @@ public class Console {
 	}
 	
     public static void main(String[] args) {
-        Console game = new Console(15,5);
-        //game.AIvsAI();
-        game.PlayervsAI();
+
+        //game.PlayervsAI();
     }
 }

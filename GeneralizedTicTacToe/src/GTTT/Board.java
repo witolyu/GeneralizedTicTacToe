@@ -1,10 +1,6 @@
 package GTTT;
 import java.util.Scanner;
-
-import org.omg.CosNaming.NamingContextExtPackage.AddressHelper;
-
 import java.lang.*;
-import java.time.chrono.MinguoChronology;
 import java.util.HashSet;
 
 
@@ -13,14 +9,20 @@ public class Board {
 	private int size = 3;
 	private int winningRowSize = 3;
 	
-	//0=exhaustive search, 1=within the winning row search.
-	private int searchMode = 0;
+	public boolean searchMode1 = true;
+	public boolean searchMode2 = true;
+	public boolean searchMode3 = true;
+	
 	private int [][] tBoard;
 	private int player;
 	private int winner;
 	private HashSet<Integer> movesAvailable;
+	private HashSet<Integer> movesHalfAvailable;
 	private HashSet<Integer> movesAdjacent;
 	
+	//the score from player 1 perspective.
+	private double score1 = 0;
+	private double score2 = 0;
 	private int moveCount;
 	private boolean gameOver;
 	
@@ -36,17 +38,23 @@ public class Board {
 	   	this.winningRowSize = winningRowSize;
 	   	this.tBoard = new int [size][size];
 	   	movesAvailable = new HashSet<>();
+	   	movesHalfAvailable = new HashSet<>();
 	   	movesAdjacent = new HashSet<>();
 	   	reset();
 	}
 	
-	public Board(int size, int winningRowSize,int searchMode) {
-	   	this.searchMode = searchMode;
+	public Board(int size, int winningRowSize,int[] searchMode, int[] rivalSearchMode) {
+		this.searchMode1 = (searchMode[0]==1||searchMode[1]==1||rivalSearchMode[0]==1||rivalSearchMode[1]==1)?true:false;
+		this.searchMode2 = (searchMode[0]==2||searchMode[1]==2||rivalSearchMode[0]==2||rivalSearchMode[1]==2)?true:false;
+		this.searchMode3 = (searchMode[0]==3||searchMode[1]==3||rivalSearchMode[0]==3||rivalSearchMode[1]==3)?true:false;
 	   	this.size = size;
 	   	this.winningRowSize = winningRowSize;
 	   	this.tBoard = new int [size][size];
 	   	movesAvailable = new HashSet<>();
-	   	movesAdjacent = new HashSet<>();
+	   	if (searchMode2)
+	   		movesHalfAvailable = new HashSet<>();
+	   	if (searchMode3)
+	   		movesAdjacent = new HashSet<>();
 	   	reset();
 	}
 	
@@ -55,6 +63,8 @@ public class Board {
 		gameOver = false;
 		player = 1;
 		winner = 0;
+		score1 = 0;
+		score2 = 0;
 		initialize();
 	}
 	
@@ -67,9 +77,12 @@ public class Board {
 	   		}
 	   	}
 		movesAvailable.clear();
-		movesAdjacent.clear();
+		if (searchMode2)
+		movesHalfAvailable.clear();
+		if (searchMode3)
+			movesAdjacent.clear();
 		
-		if (searchMode == 0){
+		if (!searchMode1){
 			for (int i = 0; i < size*size; i++) {
 	            movesAvailable.add(i);
 	        }
@@ -94,13 +107,41 @@ public class Board {
 		}
 		if (tBoard[x][y] == 0){
 			tBoard[x][y] = player;	
+			
+			gameOver = (size*size == moveCount);
+			winner = CheckGameOver(x, y);
+			//winner = CheckGameOver();
+			if (winner!=0){
+				gameOver = true;
+			}
+			
+			if (gameOver && winner == 1) {
+		        score1 = score2 = Double.POSITIVE_INFINITY;
+		    } else if (gameOver && winner == 2) {
+		    	score1 = score2 = Double.NEGATIVE_INFINITY;
+		    } else {
+		    	int[][] parsedBoard = new int [size][size];
+		        for (int i = 0; i<size; i++)
+		        {
+		        	for (int j = 0; j<size; j++){
+		        		if (tBoard[i][j] == 2){
+		        			parsedBoard[i][j] = -1;
+		        		}else{
+		        			parsedBoard[i][j] = tBoard[i][j];
+		        		}
+		        	}
+		        }
+		    	score1 += Evaluation.evaluateIncrementScore(parsedBoard, x, y, winningRowSize, size, 1);
+		    	parsedBoard[x][y] = (player==1?1:-1);
+				score2 += Evaluation.evaluateIncrementScore(parsedBoard, x, y, winningRowSize, size, 2); 
+		    }		
 		}else{
 			return false;
 		}
 		
 		moveCount++;
 
-		if (searchMode==1){
+		if (searchMode1){
 			int x_start,x_end,y_start,y_end;
 			x_start = Math.max(x - winningRowSize+1, 0);
 			x_end = Math.min(x + winningRowSize-1, size-1);
@@ -135,41 +176,76 @@ public class Board {
 				if (tBoard[i][j] == 0)
 					movesAvailable.add(hashIndex(i,j));
 			}	
-			
-
 		}
 		movesAvailable.remove(hashIndex(x, y));
 		
-		movesAdjacent.remove(hashIndex(x, y));
-		
-		//Add adjacent move if they are blank while make sure they're not out of range.
-		if (x-1>=0 && y-1 >=0 && tBoard[x-1][y-1] == 0)
-			movesAdjacent.add(hashIndex(x-1, y-1));
-		if (x-1>=0 && tBoard[x-1][y] == 0)
-			movesAdjacent.add(hashIndex(x-1, y));
-		if (x-1>=0 && y+1 <= size - 1 && tBoard[x-1][y+1] == 0)
-			movesAdjacent.add(hashIndex(x-1, y+1));
-		if (y-1 >=0 && tBoard[x][y-1] == 0)
-			movesAdjacent.add(hashIndex(x, y-1));
-		if (y+1 <= size - 1 && tBoard[x][y+1] == 0)
-			movesAdjacent.add(hashIndex(x, y+1));
-		if (x+1 <= size - 1 && y-1 >=0 && tBoard[x+1][y-1] == 0)
-			movesAdjacent.add(hashIndex(x+1, y-1));
-		if (x+1 <= size - 1 && tBoard[x+1][y] == 0)
-			movesAdjacent.add(hashIndex(x+1, y));
-		if (x+1 <= size - 1 && y+1 <= size - 1 && tBoard[x+1][y+1] == 0)
-			movesAdjacent.add(hashIndex(x+1, y+1));
-		
-		gameOver = (size*size == moveCount);
-		winner = CheckGameOver(x, y);
-		//winner = CheckGameOver();
-		if (winner!=0){
-			gameOver = true;
+		if (searchMode2){
+			int x_start,x_end,y_start,y_end;
+			x_start = Math.max(x - winningRowSize/2, 0);
+			x_end = Math.min(x + winningRowSize/2, size-1);
+			y_start = Math.max(y - (winningRowSize/2), 0);
+			y_end = Math.min(y + winningRowSize/2, size-1);
+			// add the vertical column positions 
+			for (int i = x_start;i<=x_end;i++){
+				if (tBoard[i][y] == 0)
+					movesHalfAvailable.add(hashIndex(i, y));
+			}
+			// add the vertical column positions 
+			for (int j = y_start;j<=y_end;j++){
+				if (tBoard[x][j] == 0)
+					movesHalfAvailable.add(hashIndex(x,j));
+			}
+			//add the \ diagonal positions
+			for (int i = x,j=y; i>=x_start && j >=y_start ;i--,j--){
+				if (tBoard[i][j] == 0)
+					movesHalfAvailable.add(hashIndex(i,j));
+			}
+			for (int i = x,j=y; i<=x_end && j <=y_end ;i++,j++){
+				if (tBoard[i][j] == 0)
+					movesHalfAvailable.add(hashIndex(i,j));
+			}
+			
+			//add the / diagonal positions
+			for (int i = x,j=y; i>=x_start && j <=y_end ;i--,j++){
+				if (tBoard[i][j] == 0)
+					movesHalfAvailable.add(hashIndex(i,j));
+			}
+			for (int i = x,j=y; i<=x_end && j >=y_start ;i++,j--){
+				if (tBoard[i][j] == 0)
+					movesHalfAvailable.add(hashIndex(i,j));
+			}
+			movesHalfAvailable.remove(hashIndex(x, y));
 		}
+
+		
+		if (searchMode3){
+			movesAdjacent.remove(hashIndex(x, y));
+			
+			//Add adjacent move if they are blank while make sure they're not out of range.
+			if (x-1>=0 && y-1 >=0 && tBoard[x-1][y-1] == 0)
+				movesAdjacent.add(hashIndex(x-1, y-1));
+			if (x-1>=0 && tBoard[x-1][y] == 0)
+				movesAdjacent.add(hashIndex(x-1, y));
+			if (x-1>=0 && y+1 <= size - 1 && tBoard[x-1][y+1] == 0)
+				movesAdjacent.add(hashIndex(x-1, y+1));
+			if (y-1 >=0 && tBoard[x][y-1] == 0)
+				movesAdjacent.add(hashIndex(x, y-1));
+			if (y+1 <= size - 1 && tBoard[x][y+1] == 0)
+				movesAdjacent.add(hashIndex(x, y+1));
+			if (x+1 <= size - 1 && y-1 >=0 && tBoard[x+1][y-1] == 0)
+				movesAdjacent.add(hashIndex(x+1, y-1));
+			if (x+1 <= size - 1 && tBoard[x+1][y] == 0)
+				movesAdjacent.add(hashIndex(x+1, y));
+			if (x+1 <= size - 1 && y+1 <= size - 1 && tBoard[x+1][y+1] == 0)
+				movesAdjacent.add(hashIndex(x+1, y+1));
+		}
+
 
 		player = 3-player;
 		return true;
 	}
+	
+	
 	
 	//Check whether the game reach a draw or win.
 	public boolean isGameOver () {
@@ -187,6 +263,14 @@ public class Board {
   //Check whose turn it is.
     public int getPlayer () {
         return player;
+    }
+    
+    public double getScore1(){
+    	return score1;
+    }
+    
+    public double getScore2(){
+    	return score2;
     }
     
     public int getWinningRowSize(){
@@ -212,17 +296,32 @@ public class Board {
         }
         board.player = this.player;
         board.winner = this.winner;
+        board.searchMode1 = this.searchMode1;
+        board.searchMode2 = this.searchMode2;
+        board.searchMode3 = this.searchMode3;
         board.movesAvailable    = new HashSet<>();
         board.movesAvailable.addAll(this.movesAvailable);
-        board.movesAdjacent    = new HashSet<>();
-        board.movesAdjacent.addAll(this.movesAdjacent);
+        if (searchMode2){
+            board.movesHalfAvailable = new HashSet<>();
+            board.movesHalfAvailable.addAll(this.movesHalfAvailable);
+        }
+        if (searchMode3){
+            board.movesAdjacent    = new HashSet<>();
+            board.movesAdjacent.addAll(this.movesAdjacent);
+        }
         board.moveCount = this.moveCount;
         board.gameOver = this.gameOver;
+    	board.score1 = this.score1;
+    	board.score2 = this.score2;
         return board;
     }
     
     public HashSet<Integer> getAvailableMoves () {
         return movesAvailable;
+    }
+    
+    public HashSet<Integer> getHalfAvailableMoves () {
+        return movesHalfAvailable;
     }
     
     public HashSet<Integer> getAdjacentMoves () {
@@ -445,6 +544,74 @@ public class Board {
   		   	}
   		}
   		
+  		public void PrintBoardLiteWithHalfAvail(){
+  			/*Print first line*/
+  			System.out.print("x\\y|");
+  			for (int i = 0; i < size ; i++)
+  			{
+  				System.out.printf("%2d", i+1);
+  			}
+  			System.out.print("\n");
+  			
+  			/*Print second line*/
+  			System.out.print("---|");
+  			for (int i = 0; i < size ; i++)
+  			{
+  				System.out.print("--");
+  			}
+  			System.out.print("\n");
+  			
+  			/*Print the rest*/
+  			
+  			for (int i = 0; i < size ; i++)
+  		   	{
+  				System.out.printf("%2d |",i+1);
+  		   		for (int j = 0; j < size; j++)
+  		   		{
+  		   			if (movesHalfAvailable.contains(hashIndex(i,j))){
+  		   				System.out.print(" #");
+  		   			}else{
+  		   				System.out.print(" "+tokenLite[tBoard[i][j]]);
+  		   			}
+  		   		}
+  		   		System.out.print("\n");
+  		   	}
+  		}
+  		
+  		public void PrintBoardLiteWithAdaj(){
+  			/*Print first line*/
+  			System.out.print("x\\y|");
+  			for (int i = 0; i < size ; i++)
+  			{
+  				System.out.printf("%2d", i+1);
+  			}
+  			System.out.print("\n");
+  			
+  			/*Print second line*/
+  			System.out.print("---|");
+  			for (int i = 0; i < size ; i++)
+  			{
+  				System.out.print("--");
+  			}
+  			System.out.print("\n");
+  			
+  			/*Print the rest*/
+  			
+  			for (int i = 0; i < size ; i++)
+  		   	{
+  				System.out.printf("%2d |",i+1);
+  		   		for (int j = 0; j < size; j++)
+  		   		{
+  		   			if (movesAdjacent.contains(hashIndex(i,j))){
+  		   				System.out.print(" #");
+  		   			}else{
+  		   				System.out.print(" "+tokenLite[tBoard[i][j]]);
+  		   			}
+  		   		}
+  		   		System.out.print("\n");
+  		   	}
+  		}
+  		
   //*********************************************************************Obselete********************************************************************//
 
 	//Return 0 if no one win, 1 for player 1 win, 2 for player 2 win.
@@ -567,16 +734,18 @@ public class Board {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		Board newboard = new Board(15, 5, 1);
+		Board newboard = new Board(15, 5);
 		//newboard.tBoard[0][0] = newboard.tBoard[0][1] = newboard.tBoard[0][2] = newboard.tBoard[0][3] = newboard.tBoard[0][4] = 2;
 		//newboard.tBoard[0][0] = newboard.tBoard[1][1] = newboard.tBoard[2][2] = newboard.tBoard[3][3] = newboard.tBoard[4][4] = 2;
 		//newboard.tBoard[3][3] = 1;
 		//newboard.tBoard[0][0] = newboard.tBoard[1][0] = newboard.tBoard[2][0] = newboard.tBoard[3][0] = newboard.tBoard[4][0] = 2;
 		//newboard.tBoard[0][4] = newboard.tBoard[1][3] = newboard.tBoard[2][2] = newboard.tBoard[3][1] = newboard.tBoard[4][0] = 2;
 		newboard.move(7,7);
-		newboard.PrintBoardLiteWithAvail();
+		//newboard.PrintBoardLiteWithHalfAvail();
+		newboard.PrintBoardLiteWithAdaj();
 		newboard.move(7,8);
-		newboard.PrintBoardLiteWithAvail();
+		//newboard.PrintBoardLiteWithHalfAvail();
+		newboard.PrintBoardLiteWithAdaj();
 		
 		//System.out.println(newboard.checkGameOver());
 		//newboard.Player2Player();
