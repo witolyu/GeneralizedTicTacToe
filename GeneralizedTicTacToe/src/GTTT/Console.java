@@ -16,7 +16,7 @@ public class Console {
 		board.PrintBoardLite();
 		while(true)
 		{
-			System.out.printf("**********%s**********\n",date.toString());
+			System.out.printf("******Round %d****%s**********\n",board.getMoveCount(),date.toString());
 			if (board.isGameOver())
 			{
 				if (board.getWinner() == 2){
@@ -37,7 +37,7 @@ public class Console {
 			
 			board.PrintBoardLite();
 			System.out.println(board.getScore1()+","+board.getScore2());
-			System.out.printf("**********%s**********\n",date.toString());
+			System.out.printf("******Round %d****%s**********\n",board.getMoveCount(),date.toString());
 			if (board.isGameOver())
 			{
 				if (board.getWinner()==1)

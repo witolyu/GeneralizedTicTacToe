@@ -1,10 +1,12 @@
 package GTTT;
 
+import java.util.Random;
+
 public class Evaluation {
 	
 	//at current implementation adversary Bonus cannot be other than 1.0.
 
-	
+	private static Random rand = new Random();
 	
 	private Evaluation(){}
 	
@@ -164,11 +166,11 @@ public class Evaluation {
     	int w = Math.min(y, winningRowSize-1);
     	int e = Math.min(size-winningRowSize-y, 0);
     	
-    	int nw = Math.min(winningRowSize-1,Math.min(x,y));
-    	int se = Math.min(0,Math.min(size-winningRowSize-x, size-winningRowSize-y));
+    	int nw = Math.min(n,w);
+    	int se = Math.min(s,e);
     	
-    	int ne = Math.min(winningRowSize-1,Math.min(x, size-winningRowSize-y));
-    	int sw = Math.min(0,Math.min(size-winningRowSize-x, y-winningRowSize+1));
+    	int ne = Math.min(n,Math.min(winningRowSize-1, size-1-y));
+    	int sw = Math.min(s,Math.min(0, y-(winningRowSize-1)));
     	
     	//feature of player 1.
     	int[] feature1 = new int[winningRowSize-1];
@@ -375,8 +377,10 @@ public class Evaluation {
     		//System.out.printf("%d:%d, ", i+1 , feature[i]);
     		incrementScore += (i+1)*feature1[i]*Math.pow(Algorithms.connectBonus[hostPlayer-1],i)*Algorithms.player1Bonus[hostPlayer-1]
     							+ (i+1)*feature2[i]*Math.pow(Algorithms.connectBonus[hostPlayer-1],i)*Algorithms.player2Bonus[hostPlayer-1];
-    	} 	
-    	return incrementScore;
+    	} 
+    	
+    	
+    	return incrementScore*(0.9998+0.0002*rand.nextDouble());
     }
 
     
@@ -397,17 +401,37 @@ public class Evaluation {
     }
     
     public static void main(String[] args) {
-        Board board = new Board(6, 5);
-        board.move(1,2);
-        board.move(3,1);
-        board.move(2,2);
-        board.move(4,1);
-        board.move(4,2);
-        board.move(5,1);
-        board.move(5,2);
-        board.move(3,4);
-        board.move(3,3);
+    	int total_player=3;
+		
+		int maxDepth_1=1;
+		double player1Bonus_1=1.0;
+		double player2Bonus_1=1.2;
+		double connectBonus_1=4;
+		int searchMode_1=1;
+		int rivalSearchMode_1=1;
+		boolean randomBestMove_1 = true;
+		
+		int maxDepth_2=1;
+		double player1Bonus_2=1.2;
+		double player2Bonus_2=1.0;
+		double connectBonus_2=4;
+		int searchMode_2=1;
+		int rivalSearchMode_2=1;
+		boolean randomBestMove_2 = true;
+
+		Algorithms.setParameters(total_player, maxDepth_1, player1Bonus_1, player2Bonus_1, connectBonus_1, searchMode_1,rivalSearchMode_1, randomBestMove_1, 
+				maxDepth_2, player1Bonus_2, player2Bonus_2, connectBonus_2, searchMode_2,rivalSearchMode_2, randomBestMove_2);
+    	
+    	Board board = new Board(15, 5);
+        board.move(14,14);
         board.PrintBoardLite();
+        System.out.println(board.getScore1()+","+board.getScore2());
+        board.move(13,13);
+        board.PrintBoardLite();
+        System.out.println(board.getScore1()+","+board.getScore2());
+//        board.move(7,6);
+//        board.PrintBoardLite();
+//        System.out.println(board.getScore1()+","+board.getScore2());
         //System.out.printf("The score is %d", score(board));
     }
 

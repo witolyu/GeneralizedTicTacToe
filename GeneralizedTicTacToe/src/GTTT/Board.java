@@ -101,6 +101,15 @@ public class Board {
 		return move(index/size,index%size);
 	}
 	
+	public boolean randomMove(){
+		int i = -1;
+		for (Integer randomMove:movesAvailable){
+			i=randomMove;
+			break;
+		}
+		return move(i);
+	}
+	
 	public boolean move(int x, int y){
 		if (gameOver){
 			throw new IllegalStateException("Generalized TicTacToe is over. No moves can be played.");
@@ -116,9 +125,9 @@ public class Board {
 			}
 			
 			if (gameOver && winner == 1) {
-		        score1 = score2 = Double.POSITIVE_INFINITY;
+		        score1 = score2 = 1000000-moveCount;
 		    } else if (gameOver && winner == 2) {
-		    	score1 = score2 = Double.NEGATIVE_INFINITY;
+		    	score1 = score2 = -1000000+moveCount;
 		    } else {
 		    	int[][] parsedBoard = new int [size][size];
 		        for (int i = 0; i<size; i++)
@@ -244,8 +253,6 @@ public class Board {
 		player = 3-player;
 		return true;
 	}
-	
-	
 	
 	//Check whether the game reach a draw or win.
 	public boolean isGameOver () {
