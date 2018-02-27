@@ -10,7 +10,7 @@ public class main {
 		//Set up parameters
 		int total_player=3;
 		
-		int maxDepth_1=3;
+		int maxDepth_1=1;
 		double player1Bonus_1=1.0;
 		double player2Bonus_1=1.2;
 		double connectBonus_1=2;
@@ -18,7 +18,7 @@ public class main {
 		int rivalSearchMode_1=1;
 		boolean randomBestMove_1 = false;
 		
-		int maxDepth_2=3;
+		int maxDepth_2=1;
 		double player1Bonus_2=1.2;
 		double player2Bonus_2=1.0;
 		double connectBonus_2=2;
@@ -30,7 +30,7 @@ public class main {
 				maxDepth_2, player1Bonus_2, player2Bonus_2, connectBonus_2, searchMode_2,rivalSearchMode_2, randomBestMove_2);
 		
 		//Set up games
-	    Console game = new Console(15,5,Algorithms.searchMode,Algorithms.rivalSearchMode);
+	    Console game = new Console(18,8,Algorithms.searchMode,Algorithms.rivalSearchMode);
 	    game.AIvsAI();
 
 	}

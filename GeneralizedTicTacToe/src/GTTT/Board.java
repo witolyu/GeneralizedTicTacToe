@@ -116,7 +116,7 @@ public class Board {
 		}
 		if (tBoard[x][y] == 0){
 			tBoard[x][y] = player;	
-			
+			moveCount++;
 			gameOver = (size*size == moveCount);
 			winner = CheckGameOver(x, y);
 			//winner = CheckGameOver();
@@ -147,8 +147,6 @@ public class Board {
 		}else{
 			return false;
 		}
-		
-		moveCount++;
 
 		if (searchMode1){
 			int x_start,x_end,y_start,y_end;

@@ -55,11 +55,7 @@ public class ABPMiniMax {
             }
         }
         // deterministic
-        if (indexOfBestMove == -1 && currentDepth == 1)
-        {
-        	int a=0;
-        	a++;
-        }
+
         
         if (indexOfBestMove != -1) {
         	board.move(indexOfBestMove);
@@ -96,11 +92,7 @@ public class ABPMiniMax {
             }
         }
         
-        if (indexOfBestMove == -1 && currentDepth == 1)
-        {
-        	int a=0;
-        	a++;
-        }
+
         // deterministic
         if (indexOfBestMove != -1) {
             board.move(indexOfBestMove);
